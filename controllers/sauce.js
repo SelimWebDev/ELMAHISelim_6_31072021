@@ -4,12 +4,17 @@ const Sauce = require('../models/sauce');
 exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce)
   const thing = new Sauce({
-    ...sauceObject,
+    name: sauceObject.name,
+    manufacturer: sauceObject.manufacturer,
+    description: sauceObject.description,
+    mainPepper: sauceObject.mainPepper,
+    heat: sauceObject.heat,
+    userId: sauceObject.userId,
     imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`,
-    likes: [],
-    dislikes: [],
-    userLiked: [],
-    userDisliked: []
+    likes: 0,
+    dislikes: 0,
+    usersLiked: [],
+    usersDisliked: []
   });
   thing.save().then(
     () => {
@@ -20,7 +25,7 @@ exports.createSauce = (req, res, next) => {
   ).catch(
     (error) => {
       res.status(400).json({
-        error: error
+        error: 'error'
       });
     }
   );
