@@ -2,6 +2,91 @@ const Sauce = require('../models/sauce');
 const fs = require('fs');
 
 
+exports.setLike = (req, res, next) => {
+  const userId = req.body.userId
+  const like = req.body.like
+
+  if (like == 1){
+    Sauce.findOne({_id: req.params.id}).then(
+      (sauce) => {
+        if (sauce.usersLiked.indexOf(userId) == -1){
+          sauce.likes = sauce.likes + 1
+          sauce.usersLiked.push(userId)
+          if (sauce.usersDisliked.indexOf(userId) != -1){
+            const index = sauce.usersDisliked.indexOf(userId)
+            sauce.usersDisliked.splice(index, 1)
+          }
+          res.status(200).json({
+            message: "sauce liké !"
+          });
+        }
+      }
+    )
+    .catch(
+      (error) => {
+        res.status(400).json({
+          error: 'error'
+        });
+      }
+    );
+  }
+
+  if (like == -1){
+    Sauce.findOne({_id: req.params.id}).then(
+      (sauce) => {
+        if (sauce.usersDisliked.indexOf(userId) == -1){
+          sauce.dislikes = sauce.dislikes + 1
+          sauce.usersDisliked.push(userId)
+          if (sauce.usersLiked.indexOf(userId) != -1){
+            const index = sauce.usersLiked.indexOf(userId)
+            sauce.usersLiked.splice(index, 1)
+          }
+          res.status(200).json({
+            message: "sauce Disliké !"
+          });
+        }
+      }
+    )
+    .catch(
+      (error) => {
+        res.status(400).json({
+          error: 'error'
+        });
+      }
+    );
+  }
+
+  if (like == 0){
+    Sauce.findOne({_id: req.params.id}).then(
+      (sauce) => {
+        if (sauce.usersDisliked.indexOf(userId) != -1){
+          sauce.dislikes = sauce.dislikes - 1
+          const index = sauce.usersDisliked.indexOf(userId)
+          sauce.usersDisliked.splice(index, 1)
+          res.status(200).json({
+            message: "dislike retiré !"
+          });
+        }
+        else if (sauce.usersLiked.indexOf(userId) != -1){
+          sauce.likes = sauce.likes - 1
+          const index = sauce.usersLiked.indexOf(userId)
+          sauce.usersLiked.splice(index, 1)
+          res.status(200).json({
+            message: "like retiré !"
+          });
+        }
+      }
+    )
+    .catch(
+      (error) => {
+        res.status(400).json({
+          error: 'error'
+        });
+      }
+    );
+  }
+}
+
 exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce)
   const thing = new Sauce({
