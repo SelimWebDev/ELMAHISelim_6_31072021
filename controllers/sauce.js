@@ -47,28 +47,15 @@ exports.getOneSauce = (req, res, next) => {
   );
 };
 
-exports.modifyThing = (req, res, next) => {
-  const thing = new Thing({
-    _id: req.params.id,
-    title: req.body.title,
-    description: req.body.description,
-    imageUrl: req.body.imageUrl,
-    price: req.body.price,
-    userId: req.body.userId
-  });
-  Thing.updateOne({_id: req.params.id}, thing).then(
-    () => {
-      res.status(201).json({
-        message: 'Thing updated successfully!'
-      });
-    }
-  ).catch(
-    (error) => {
-      res.status(400).json({
-        error: error
-      });
-    }
-  );
+exports.modifySauce = (req, res, next) => {
+  const sauceObject = req.file ?
+    {
+      ...JSON.parse(req.body.sauce),
+      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+    } : { ...req.body };
+  Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
+    .then(() => res.status(200).json({ message: 'Objet modifié !'}))
+    .catch(error => res.status(400).json({ error }));
 };
 
 exports.deleteThing = (req, res, next) => {

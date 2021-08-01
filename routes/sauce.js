@@ -8,8 +8,8 @@ const sauceCtrl = require('../controllers/sauce');
 
 router.get('/', tkn, sauceCtrl.getAllSauces);
 router.get('/:id', tkn, sauceCtrl.getOneSauce);
-router.post('/', tkn, multer, sauceCtrl.createSauce); ///////////// badd request 400
-//router.put('/:id', auth, sauceCtrl.modifySauce);
+router.post('/', tkn, multer, sauceCtrl.createSauce);
+router.put('/:id', tkn, multer, sauceCtrl.modifySauce);
 //router.delete('/:id', auth, sauceCtrl.deleteSauce);
 //router.post('/:id/like', auth, sauceCtrl.setLike);
 
