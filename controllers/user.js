@@ -3,6 +3,8 @@ const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken');
 
 exports.signup = (req, res, next) => {
+  const regex = new RegExp(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/);         // 8 caractère au moins une lettre et un chiffre
+  if (regex.test(req.body.password)){
     bcrypt.hash(req.body.password, 10)
     .then(hash => {
         const user = new User({
@@ -14,6 +16,10 @@ exports.signup = (req, res, next) => {
         .catch(error => res.status(400).json({ error }));
     })
     .catch(error => res.status(500).json({ error }));
+  }
+  else {
+    res.status(400).json({message: 'le mot de passe doit contenir 8 caractère, avec au moins une lettre et un chiffre et une majuscule'})
+  }
 };
 
 exports.login = (req, res, next) => {

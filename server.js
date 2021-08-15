@@ -1,7 +1,7 @@
 const http = require('http');
 const app = require('./app');
 
-const normalizePort = val => {
+const normalizePort = val => {                  // envoie un port valide en nombre ou chaine
   const port = parseInt(val, 10);
 
   if (isNaN(port)) {
@@ -15,7 +15,7 @@ const normalizePort = val => {
 const port = normalizePort(process.env.PORT || '3000');
 app.set('port', port);
 
-const errorHandler = error => {
+const errorHandler = error => {                 //  Recheche les erreur et enregistre dans le serveur
   if (error.syscall !== 'listen') {
     throw error;
   }
@@ -38,7 +38,7 @@ const errorHandler = error => {
 const server = http.createServer(app);
 
 server.on('error', errorHandler);
-server.on('listening', () => {
+server.on('listening', () => {                      // écouteur d'évenement
   const address = server.address();
   const bind = typeof address === 'string' ? 'pipe ' + address : 'port ' + port;
   console.log('Listening on ' + bind);

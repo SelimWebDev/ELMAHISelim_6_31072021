@@ -1,8 +1,7 @@
 const Sauce = require('../models/sauce');
 const fs = require('fs');
 
-
-exports.setLike = (req, res, next) => {
+exports.setLike = (req, res, next) => {                 // modifier like
   const userId = req.body.userId
   const like = req.body.like
   let totalLikes
@@ -10,7 +9,7 @@ exports.setLike = (req, res, next) => {
   let tabUsersLiked
   let tabUsersDisliked
 
-  Sauce.findOne({_id: req.params.id})
+  Sauce.findOne({_id: req.params.id})                     // on trouve la sauce défini
     .then( (obj) => {
       const sauce = obj;
       totalLikes = sauce.likes
@@ -18,8 +17,8 @@ exports.setLike = (req, res, next) => {
       tabUsersLiked = sauce.usersLiked
       tabUsersDisliked = sauce.usersDisliked
 
-      if (like == 1){
-        tabUsersLiked.push(userId);
+      if (like == 1){                                   // si like on met à jour en BDD
+        tabUsersLiked.push(userId);                 
         totalLikes += 1;
         Sauce.updateOne(
           { _id: req.params.id },
@@ -40,10 +39,10 @@ exports.setLike = (req, res, next) => {
         .catch(error => res.status(400).json({ error }));
       }
     
-      if (like == 0){
-        if (tabUsersLiked.indexOf(userId) != -1){
-          tabUsersLiked.splice(tabUsersLiked.indexOf(userId), 1);
-          totalLikes -= 1;
+      if (like == 0){                                     // si annule like ou dislike
+        if (tabUsersLiked.indexOf(userId) != -1){          // si user est dans tabuserliked
+          tabUsersLiked.splice(tabUsersLiked.indexOf(userId), 1);   // on le retire du tab en donnant son index a .splice
+          totalLikes -= 1;                                            // on update la suite
           Sauce.updateOne(
             { _id: req.params.id },
             { likes: totalLikes, usersLiked: tabUsersLiked}
@@ -71,7 +70,7 @@ exports.setLike = (req, res, next) => {
 
 }
 
-exports.createSauce = (req, res, next) => {
+exports.createSauce = (req, res, next) => {                           // créer une sauce
   const sauceObject = JSON.parse(req.body.sauce)
   const thing = new Sauce({
     name: sauceObject.name,
@@ -101,7 +100,8 @@ exports.createSauce = (req, res, next) => {
   );
 };
 
-exports.getOneSauce = (req, res, next) => {
+exports.getOneSauce = (req, res, next) => {       
+  console.log('lancement de getonesauce')
   Sauce.findOne({
     _id: req.params.id
   }).then(
@@ -110,7 +110,7 @@ exports.getOneSauce = (req, res, next) => {
     }
   ).catch(
     (error) => {
-      res.status(404).json({
+      res.status(405).json({
         error: error
       });
     }
@@ -118,11 +118,16 @@ exports.getOneSauce = (req, res, next) => {
 };
 
 exports.modifySauce = (req, res, next) => {
-  const sauceObject = req.file ?
+  const sauceObject = req.file ?                                                        // si il y a un fichier en requete, req sera sous format multipart form data
     {
-      ...JSON.parse(req.body.sauce),
-      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
-    } : { ...req.body };
+      ...JSON.parse(req.body.sauce),                                                    // on itère (parse req.sauce)
+      imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`      // sauvegarde req.fichier
+    } : { ...req.body };                                                                // sinon on itère le body dans sauceobject
+  Sauce.findOne({_id: req.params.id})
+    .then((sauce) => {
+    const filename = sauce.imageUrl.split('/images/')[1];
+    fs.unlinkSync(`images/${filename}`);
+    })
   Sauce.updateOne({ _id: req.params.id }, { ...sauceObject, _id: req.params.id })
     .then(() => res.status(200).json({ message: 'Objet modifié !'}))
     .catch(error => res.status(400).json({ error }));
